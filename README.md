@@ -1,13 +1,10 @@
 # CrimeVision.Tech
 To start:
 
-1 - Start MySQL server: 
-  >mysql.server start
+npm install
 
-2 - Start virtualenv: 
-change directory to "crime_vision"
-  >virtualenv env
-  >source env/bin/activate
+node index.js
 
-3 - Start server: 
-  >python manage.py runserver
+go to localhost:3000
+  
+  

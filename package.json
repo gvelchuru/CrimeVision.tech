@@ -1,0 +1,22 @@
+{
+  "name": "dubhacks17",
+  "version": "1.0.0",
+  "description": "dubhacks 2017 hack",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gvelchuru/CrimeWatch.Tech.git"
+  },
+  "author": "David Lanman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gvelchuru/CrimeWatch.Tech/issues"
+  },
+  "homepage": "https://github.com/gvelchuru/CrimeWatch.Tech#readme",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
