@@ -78,7 +78,6 @@
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       <br><select onChange="display_different_crimes()">
         <option value="mostRecent">Most Recent 50000</option>
-<<<<<<< HEAD
         <option value="50000more">50000 - 100000</option>
         <option value="50000more">100000 - 150000</option>
         <option value="50000more">150000 - 200000</option>
@@ -115,7 +114,8 @@
       var markers = [];
       var showMarkers = true;
       var directionsService;
-      var numberOfCrimes = 50000;
+      var offset_num = 10000;
+      var numberOfCrimes = offset_num;
       var offset = 0;
       var crimes = [];
 
@@ -175,7 +175,7 @@
                   }
                 }
             );*/
-            if (offset < 50000) {
+            if (offset < offset_num) {
               heatmap = new google.maps.visualization.HeatmapLayer({
                 data: crimes,
                 map: map,
@@ -205,8 +205,8 @@
               heatmap.setData(crimes)
               console.log("Bye")
             }
-            offset += 50000;
-            if (offset < 50000) {
+            offset += offset_num;
+            if (offset < offset_num) {
               get_crimes(numberOfCrimes, offset, crime_callback);
             }
 
@@ -257,7 +257,7 @@
         
         var willSetData = new Promise(
           function(resolve, reject) {
-            if (heat_crimes.length > 49999) {
+            if (heat_crimes.length > offset_num - 1) {
               heatmap.setData(heat_crimes);
               resolve(heat_crimes);
             } else {
@@ -268,7 +268,7 @@
         );
         heat_crimes = [];
         for (j = 0; j < val; j++) {
-          get_crimes(numberOfCrimes, j * 50000, function(data) {
+          get_crimes(numberOfCrimes, j * offset_num, function(data) {
             for(i = 0; i < data.length; i++) {
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 heat_crimes.push(crime_loc_pos)
@@ -299,7 +299,7 @@
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 crimes.push(crime_loc_pos)
             }
-            offset += 50000;
+            offset += offset_num;
         })
       }
       
