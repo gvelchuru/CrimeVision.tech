@@ -3,11 +3,12 @@
   <head>
     <meta charset="utf-8">
     <title>Heatmaps</title>
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 100%;
+        height: 90%;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
@@ -44,6 +45,10 @@
             background-color: aqua;
             border-radius: 20px;
         }
+        #custom2{
+            background-color: yellow;
+            border-radius: 20px;
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   </head>
@@ -57,7 +62,7 @@
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button-->
     </div>
-    <div id="floating"> <input id="address"></input> <button onclick="goToAddress()">search</button></div><br>
+    <div id="floating"> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
     <div id="map"></div>
     <script type="text/javascript" src="shineapirequests.js"></script> 
     <script type="text/javascript" src="spdapirequests.js"></script>
