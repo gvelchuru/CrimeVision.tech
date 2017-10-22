@@ -83,6 +83,8 @@
       <div> <input id="navto"></input> <button id = "custom2" onclick="navToAddress()"><i class="fa fa-car" aria-hidden="true"></i>&nbsp; &nbsp;Navigate To</button></div><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br><br>
       <button id = "custom" onclick="meters()">Get meters</button><br><br>
+      <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
+      <button id = "custom" onclick="togglePredictive()">Toggle Predictive Heatmap</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       <br><select onChange="display_different_crimes()">
         <option value="mostRecent">Most Recent 50000</option>
@@ -123,7 +125,7 @@
 
       var map, heatmap, predicted_heatmap, geocoder;
       var markers = [];
-      var showMarkers = true;
+      var showMarkers = false;
       var directionsService;
       var offset_num = 10000;
       var numberOfCrimes = offset_num;
@@ -133,10 +135,11 @@
       function initMap() {
         
         map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 16,
+          zoom: 14,
           // get user loc to replace center
           center: {lat: 47.6062, lng: -122.3321}, // current location is seattle
-          mapTypeId: 'satellite'
+          mapTypeId: 'satellite',
+          minZoom: 14
         });
 
         //sets location to currently but weirdly inaccurate....
@@ -217,7 +220,7 @@
               heatmap = new google.maps.visualization.HeatmapLayer({
                 data: crimes,
                 map: map,
-                radius: 200,
+                radius: 20,
               });
               google.maps.event.addListener(map, 'zoom_changed', function(){
                   if (heatmap){
@@ -450,6 +453,10 @@
       
       function toggleHeatmap() {
         heatmap.setMap(heatmap.getMap() ? null : map);
+      }
+      
+      function togglePredictive() {
+        predicted_heatmap.setMap(predicted_heatmap.getMap() ? null : map);
       }
 
       function changeGradient() {
