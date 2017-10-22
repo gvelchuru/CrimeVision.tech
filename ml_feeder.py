@@ -66,7 +66,7 @@ with open('Seattle_Police_Department_Police_Report_Incident.csv') as report_csv:
 index = 0
 key_list = list(lat_long_dict.keys())
 while True:
-    if index == (2872800 - 3000):
+    if index == (int(1.5 * 2872800) - int(1.5 * 3000)):
         break
     else:
         i = random.randint(0, len(key_list) - 1)
