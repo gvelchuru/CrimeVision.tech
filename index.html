@@ -206,7 +206,7 @@
               console.log("Bye")
             }
             offset += 50000;
-            if (offset < 740000) {
+            if (offset < 50000) {
               get_crimes(numberOfCrimes, offset, crime_callback);
             }
 
@@ -254,16 +254,42 @@
       }
 
       function updateTimeHeatMap(val) {
+        
+        var willSetData = new Promise(
+          function(resolve, reject) {
+            if (heat_crimes.length > 49999) {
+              heatmap.setData(heat_crimes);
+              resolve(heat_crimes);
+            } else {
+              var reason = new Error("Heat crimes was sent before fully loaded");
+              reject(reason);
+            }
+          }
+        );
         heat_crimes = [];
         for (j = 0; j < val; j++) {
           get_crimes(numberOfCrimes, j * 50000, function(data) {
             for(i = 0; i < data.length; i++) {
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 heat_crimes.push(crime_loc_pos)
+
             }
-        })
+            heatmap.setData(heat_crimes)
+          })
         }
-        heatmap.set('data', heat_crimes)
+        console.log("About to set data")
+        var set = function() {
+          willSetData
+            .then(function(fulfilled) {
+              console.log("Fulfilled")
+            })
+            .catch(function(error) {
+              console.log("heat_crimes was not done")
+            })
+        }
+        set();
+        
+        console.log("Setted data")
       }
 
 
