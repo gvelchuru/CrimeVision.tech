@@ -62,7 +62,8 @@
       <br><select onChange="display_different_crimes()">
         <option value="mostRecent">Most Recent 50000</option>
         <option value="older50000">50000 - 100000</option>
-      </select> 
+      </select> <br>
+      <input type = "range" min="0" max="15" value="15" oninput="updateTimeHeatMap(value)">
       <!--button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button-->
@@ -198,6 +199,20 @@
         directionsService = new google.maps.DirectionsService;
 
       }
+      function updateTimeHeatMap(val) {
+        heat_crimes = [];
+        for (j = 0; j < val; j++) {
+          get_crimes(numberOfCrimes, j * 50000, function(data) {
+            for(i = 0; i < data.length; i++) {
+                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
+                heat_crimes.push(crime_loc_pos)
+            }
+        })
+        }
+        heatmap.set('data', heat_crimes)
+      }
+
+
       function updateCrimeHeatMap() {
         get_crimes(numberOfCrimes, offset, function(data) {
             for(i = 0; i < data.length; i++) {
