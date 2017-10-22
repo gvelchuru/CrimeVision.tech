@@ -20,27 +20,27 @@ function measure(lat1, lon1, lat2, lon2){  // generally used geo measurement fun
 //    return False 
     
 function get_meters_url(lat, lng) {
-    url = "https://apis.solarialabs.com/shine/v1/parking-rules/meters?lat="
-    url += lat
-    url += "&long="+lng
-    url += "&max-results=10&apikey=vyd6xVuOrpFCfkHRF6xETS9km7riggZe"
+    url = "https://apis.solarialabs.com/shine/v1/parking-rules/meters?lat=";
+    url += lat;
+    url += "&long="+lng;
+    url += "&max-results=10&apikey=vyd6xVuOrpFCfkHRF6xETS9km7riggZe";
     return url
 }    
 
 function get_meters(lat, lng, callback) {
     // stored = fetch_nearby(lat, lng) 
     // if(stored) return stored
-    url = get_meters_url(lat, lng)
-    console.log(lat, lng)
+    url = get_meters_url(lat, lng);
+    console.log(lat, lng);
     let options = {
       "url": url,
       "method": "GET",
       "processData": false
-    }
-    console.log("here")
+    };
+    console.log("here");
 
     $.ajax(options).done((response)=>{
-        success: callback(response)
+        callback(response)
     })
     //response = requests.get(url)
     // LIST_OF_LATLNGS[(lat, lng)] = response
