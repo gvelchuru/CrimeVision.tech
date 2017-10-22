@@ -3,56 +3,70 @@
   <head>
     <meta charset="utf-8">
     <title>Heatmaps</title>
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 100%;
+        height: 90%;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
         height: 100%;
-        margin: 10;
-        padding: 0;
       }
       #floating-panel {
         position: absolute;
-        top: 10px;
-        left: 25%;
-        z-index: 5;
-        background-color: #fff;
-        padding: 5px;
-        border: 1px solid #999;
+        top: 120px;
+        left: 5%;
+        z-index: 3;
         text-align: center;
         font-family: 'Roboto','sans-serif';
         line-height: 30px;
-        padding-left: 10px;
+        border-color: aqua;
       }
       #floating-panel {
-        background-color: #fff;
-        border: 1px solid #999;
-        left: 25%;
-        padding: 5px;
+        left: 5%;
         position: absolute;
-        top: 10px;
-        z-index: 5;
+        top: 120px;
+        z-index: 3;
       }
+        #floating{
+            position: absolute;
+        top: 80px;
+        left: 5%;
+        z-index: 3;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        border-color: aqua;
+            
+        }
+        #custom{
+            background-color: aqua;
+            border-radius: 20px;
+        }
+        #custom2{
+            background-color: yellow;
+            border-radius: 20px;
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   </head>
 
-  <body>
-    <div id="floating-panel">
-      <button onclick="toggleHeatmap()">Toggle Heatmap</button>
-      <button onclick="meters()">Get meters</button>
+<<<<<<< HEAD
 
+    <div id="floating-panel">
+      <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
+      <button id = "custom" onclick="meters()">Get meters</button><br>
+      <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       <!--button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button-->
     </div>
-    <div> <input default="enter an address"></input> <button>search</button></div><br>
+    <div> <input id="address"></input> <button onclick="goToAddress()">search</button></div>
+    <div> <input id="navto"></input> <button onclick="navToAddress()">navigate to</button></div><br>
+    <div id="floating"> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
     <div id="map"></div>
-
     <script type="text/javascript" src="shineapirequests.js"></script> 
     <script type="text/javascript" src="spdapirequests.js"></script>
     <script>
@@ -61,44 +75,81 @@
       // parameter when you first load the API. For example:
       // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
 
-      var map, heatmap;
+      var map, heatmap, geocoder;
+      var markers = [];
+      var showMarkers = true;
+      var directionsService;
 
       function initMap() {
+        
         map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 13,
+          zoom: 16,
           // get user loc to replace center
           center: {lat: 47.6062, lng: -122.3321}, // current location is seattle
           mapTypeId: 'satellite'
         });
 
-        
+        //sets location to currently but weirdly inaccurate....
+        /*navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            map.setCenter(pos);
+            get_meters(map.center.lat(), map.center.lng(), function(data) {
+            for(i = 0; i < data.length; i++) {
+                makeMarker(data[i]);
+                var request = {
+                    location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
+                    radius: 500, 
+                    type: "parking"
+                }
+                placeService.nearbySearch(request, process);
+            }
+            })
+        });*/
         
         get_meters(map.center.lat(), map.center.lng(), function(data) {
             for(i = 0; i < data.length; i++) {
                 makeMarker(data[i]);
             }
-        });
+        })
 
         get_crimes(function(data) {
-            crime_location = [];
+            crime_location = []
             for(i = 0; i < data.length; i++) {
-                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude']);
+                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 crime_location.push(crime_loc_pos)
             }
             heatmap = new google.maps.visualization.HeatmapLayer({
               data: crime_location,
               map: map,
-              dissipating: true,
-              radius: 50
+              radius: 200,
             });
-        });
+
+            google.maps.event.addListener(map, 'zoom_changed', function(){
+                if (heatmap){
+                    var zoom = map.getZoom();
+                    console.log(zoom) // zoom inc as you zoom in
+                    if (zoom >= 16){
+                        heatmap.set('radius', zoom*13);
+                        heatmap.set('dissipating', true);
+                    } else if (zoom > 13 && zoom < 16){
+                        heatmap.set('radius', zoom*5);
+                    } else {
+                        heatmap.set('radius', zoom); 
+                        heatmap.set('dissipating', true); 
+                    }
+                }
+            });
+        })
         
         placeService = new google.maps.places.PlacesService(map);
         var request = {
             location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
             radius: 500, 
             type: "parking"
-        };
+        }
         placeService.nearbySearch(request, process);
         
         function process(data, status, pagination) {
@@ -121,13 +172,107 @@
                     location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
                     radius: 500, 
                     type: "parking"
-                };
+                }
                 placeService.nearbySearch(request, process);
             }
-        }) } );
+          });});
+        
+        geocoder = new google.maps.Geocoder();
+        directionsService = new google.maps.DirectionsService;
 
       }
-        
+      
+      function goToAddress() {
+        geocoder.geocode( { 'address' : $('#address').val() }, function( results, status ) {
+            if( status == google.maps.GeocoderStatus.OK ) {
+
+                map.setCenter( results[0].geometry.location );
+
+                function process(data, status, pagination) {
+                   if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                      return;
+                   }
+                   for(i = 0; i < data.length; i++) {
+                        makeParkMarker(data[i]);
+                   }
+                   if (pagination.hasNextPage) {
+                        //sleep:2;
+                        console.log(pagination.nextPage());
+                   }
+                }
+                get_meters(map.center.lat(), map.center.lng(), function(data) {
+                    for(i = 0; i < data.length; i++) {
+                        makeMarker(data[i]);
+                        var request = {
+                            location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
+                            radius: 500, 
+                            type: "parking"
+                        }
+                        placeService.nearbySearch(request, process);
+                        console.log("asdasda");
+                    }
+                })
+            } else {
+                alert( 'Geocode was not successful for the following reason: ' + status );
+            }
+        } );
+      }
+      
+      function navToAddress() {
+        geocoder.geocode( { 'address' : $('#navto').val() }, function( results, status ) {
+            if( status == google.maps.GeocoderStatus.OK ) {
+
+                //map.setCenter( results[0].geometry.location );
+                var directionsDisplay = new google.maps.DirectionsRenderer({map: map});
+                directionsService.route({
+                  origin: $('#address').val(),
+                  destination: $('#navto').val(),
+                  travelMode: 'DRIVING'
+                }, function(response, status) {
+                  // Route the directions and pass the response to a function to create
+                  // markers for each step.
+                  if (status === 'OK') {
+                    //document.getElementById('warnings-panel').innerHTML =
+                    //    '<b>' + response.routes[0].warnings + '</b>';
+                    directionsDisplay.setDirections(response);
+                    //showSteps(response, markerArray, stepDisplay, map);
+                  } else {
+                    window.alert('Directions request failed due to ' + status);
+                  }
+                });
+              
+
+
+                function process(data, status, pagination) {
+                   if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                      return;
+                   }
+                   for(i = 0; i < data.length; i++) {
+                        makeParkMarker(data[i]);
+                   }
+                   if (pagination.hasNextPage) {
+                        //sleep:2;
+                        console.log(pagination.nextPage());
+                   }
+                }
+                get_meters(map.center.lat(), map.center.lng(), function(data) {
+                    for(i = 0; i < data.length; i++) {
+                        makeMarker(data[i]);
+                        var request = {
+                            location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
+                            radius: 500, 
+                            type: "parking"
+                        }
+                        placeService.nearbySearch(request, process);
+                        console.log("asdasda");
+                    }
+                })
+            } else {
+                alert( 'Geocode was not successful for the following reason: ' + status );
+            }
+        } );
+      }
+       
       /*function get_parking(callback) {
         lat = map.center.lat();
         lng = map.center.lng();
@@ -164,7 +309,7 @@
           'rgba(127, 0, 63, 1)',
           'rgba(191, 0, 31, 1)',
           'rgba(255, 0, 0, 1)'
-        ];
+        ]
         heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
       }
 
@@ -200,19 +345,21 @@
             position: {lat: data["Latitude"], lng: data["Longitude"]},
             map: map, 
             icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+            visible: showMarkers
 
         });
         marker.addListener('click', function() {
           infowindow.open(map, marker);
         });
+        markers.push(marker);
       }
       
       function generate_info(data) {
-        contentString = '<div><ul>';
-        contentString += '<li>Meter ID: ' + data["Meter_ID"] + '</li>';
-        contentString += '<li>Hours: ' + data["Hours_of_Operation"] + '</li>';
-        contentString += '<li>Area: ' + data["Area"] + '</li>';
-        contentString += '</ul></div>';
+        contentString = '<div><ul>'
+        contentString += '<li>Meter ID: ' + data["Meter_ID"] + '</li>'
+        contentString += '<li>Hours: ' + data["Hours_of_Operation"] + '</li>'
+        contentString += '<li>Area: ' + data["Area"] + '</li>'
+        contentString += '</ul></div>'
         return contentString;
       }
       
@@ -225,21 +372,31 @@
         var marker = new google.maps.Marker({ 
             position: {lat: data.geometry.location.lat(), lng: data.geometry.location.lng()},
             icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-            map: map
+            map: map,
+            visible: showMarkers
         });
         marker.addListener('click', function() {
           infowindow.open(map, marker);
         });
+        markers.push(marker);
       }
       
       function generate_park_info(data) {
-        contentString = '<div><ul>';
-        contentString += '<li>Name: ' + data.name + '</li>';
-        contentString += '<li>Rating: ' + data.rating + '</li>';
-        contentString += '<li>Vicinity: ' + data.vicinity + '</li>';
-        contentString += '</ul></div>';
+        contentString = '<div><ul>'
+        contentString += '<li>Name: ' + data.name + '</li>'
+        contentString += '<li>Rating: ' + data.rating + '</li>'
+        contentString += '<li>Vicinity: ' + data.vicinity + '</li>'
+        contentString += '</ul></div>'
         return contentString;
       }
+      
+      function toggleMarkers() {
+        showMarkers = !showMarkers;
+        for(i = 0; i < markers.length; i++) {
+            markers[i].setVisible(showMarkers);
+        }
+      }
+
       
     </script>
     <script async defer

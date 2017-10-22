@@ -1,14 +1,12 @@
 import csv
-import json
 from collections import OrderedDict
 
-import autosklearn.classification
-from sklearn import metrics
-
 import joblib
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
 import numpy as np
+from sklearn import metrics
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
 
 # response_dict = json.load(open('initial_response_data.json'))
 # print('kurwa')
@@ -29,7 +27,7 @@ max_lat = 47.8
 min_long = -122.5
 max_long = -122.2
 
-min_year = 2014
+min_year = 2012
 max_year = 2017
 
 iterate = .001
