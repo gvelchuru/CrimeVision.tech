@@ -81,20 +81,11 @@
      <img src="logo.png" width="50%" height="50%">
       <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Starting Point</button></div><br>
       <div> <input id="navto"></input> <button id = "custom2" onclick="navToAddress()"><i class="fa fa-car" aria-hidden="true"></i>&nbsp; &nbsp;Navigate To</button></div><br>
-      <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br><br>
-      <button id = "custom" onclick="meters()">Get meters</button><br><br>
+      <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
       <button id = "custom" onclick="togglePredictive()">Toggle Predictive Heatmap</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
-      <br><select onChange="display_different_crimes()">
-        <option value="mostRecent">Most Recent 50000</option>
-        <option value="50000more">50000 - 100000</option>
-        <option value="50000more">100000 - 150000</option>
-        <option value="50000more">150000 - 200000</option>
-        <option value="50000more">200000 - 250000</option>
-        <option value="older50000">50000 - 100000</option>
-      </select> 
-<br>
+      
      <p>Past &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Future</p>
       <input type = "range" min="0" max="15" value="15" oninput="updateTimeHeatMap(value)">
       <!--button onclick="changeGradient()">Change gradient</button>
