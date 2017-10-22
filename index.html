@@ -125,7 +125,7 @@
       function initMap() {
         
         map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 16,
+          zoom: 14,
           // get user loc to replace center
           center: {lat: 47.6062, lng: -122.3321}, // current location is seattle
           mapTypeId: 'satellite'
@@ -167,7 +167,7 @@
           }
         })
 
-        get_predictions(function(data) {
+        /*get_predictions(function(data) {
           predicts = []
           for (i = 0; i < good_indeces.length; i++) {
             predicted_vals = new google.maps.LatLng(data[good_indeces[i]][0], data[good_indeces[i]][1])
@@ -197,7 +197,7 @@
                 radius: 20,
                 gradient: grad
           });
-        })
+        })*/
         
         function crime_callback(data) {
           for(i = 0; i < data.length; i++) {
@@ -216,15 +216,15 @@
                       console.log("addListener")
                       var zoom = map.getZoom();
                       console.log(zoom) // zoom inc as you zoom in
-                      if (zoom >= 16){
+                      if (zoom > 16){
                           heatmap.set('radius', zoom*13);
-                          heatmap.set('dissipating', true);
-                      } else if (zoom > 13 && zoom < 16){
-                          heatmap.set('radius', zoom*5);
+                      } else if (zoom <= 16 && zoom > 14) {
+                          heatmap.set('radius', zoom*4);
                       } else {
                           heatmap.set('radius', zoom); 
-                          heatmap.set('dissipating', true); 
+                          
                       }
+                      heatmap.set('dissipating', true);
                   }
                 }
               );
