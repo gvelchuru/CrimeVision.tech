@@ -57,11 +57,11 @@
             color: white;
         }
         #mycanvas{
-            top: -10%;
+            top: -2%;
             left: 4%;
             position: absolute;
             z-index: 3;
-            height: 650px;
+            height: 500px;
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -71,9 +71,9 @@
             var c=document.getElementById("mycanvas");
             var ctx=c.getContext("2d");
             // Turn transparency on
-            ctx.globalAlpha=0.2;
+            ctx.globalAlpha=0.4;
             ctx.fillStyle="blue"; 
-            ctx.fillRect(0,40,80,450); 
+            ctx.fillRect(0,40,90,450); 
         </script>
         
     </canvas>
