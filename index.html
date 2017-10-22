@@ -75,7 +75,7 @@
       <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
       <div> <input id="navto"></input> <button id = "custom2" onclick="navToAddress()"><i class="fa fa-car" aria-hidden="true"></i>&nbsp; &nbsp;Navigate To</button></div><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
-      <button id = "custom" onclick="meters()">Get meters</button><br>
+      <button id = "custom" onclick="togglePredictive()">Toggle Predictive Heatmap</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       <br><select onChange="display_different_crimes()">
         <option value="mostRecent">Most Recent 50000</option>
@@ -442,6 +442,10 @@
       
       function toggleHeatmap() {
         heatmap.setMap(heatmap.getMap() ? null : map);
+      }
+      
+      function togglePredictive() {
+        predicted_heatmap.setMap(predicted_heatmap.getMap() ? null : map);
       }
 
       function changeGradient() {
