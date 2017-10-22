@@ -1,6 +1,8 @@
 import csv
 import json
 from collections import OrderedDict
+
+import autosklearn.classification
 from sklearn import metrics
 
 import joblib
@@ -27,7 +29,7 @@ max_lat = 47.8
 min_long = -122.5
 max_long = -122.2
 
-min_year = 2016
+min_year = 2014
 max_year = 2017
 
 iterate = .001
@@ -37,6 +39,11 @@ for lat in np.arange(min_lat, max_lat, iterate):
         for year in range(min_year, max_year + 1):
             for month in range(1, 12 + 1):
                 lat_long_dict[truncate(lat, 3), truncate(long, 3), year, month] = 0
+
+# for lat in np.arange(min_lat, max_lat, iterate):
+#     for long in np.arange(min_long, max_long, iterate):
+#             for month in range(1, 12 + 1):
+#                 lat_long_dict[truncate(lat, 3), truncate(long, 3), month] = 0
 
 
 
@@ -106,6 +113,7 @@ with open('Seattle_Police_Department_Police_Report_Incident.csv') as report_csv:
 
 print('Training...')
 classifier = KNeighborsClassifier(n_jobs=-1)
+# classifier = autosklearn.classification.AutoSklearnClassifier()
 data = list(lat_long_dict.keys())
 target = list(lat_long_dict.values())
 X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=0.1)

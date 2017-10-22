@@ -86,8 +86,23 @@
             heatmap = new google.maps.visualization.HeatmapLayer({
               data: crime_location,
               map: map,
-              dissipating: true,
-              radius: 50
+              radius: 200,
+            });
+
+            google.maps.event.addListener(map, 'zoom_changed', function(){
+                if (heatmap){
+                    var zoom = map.getZoom();
+                    console.log(zoom) // zoom inc as you zoom in
+                    if (zoom >= 16){
+                        heatmap.set('radius', zoom*13);
+                        heatmap.set('dissipating', true);
+                    } else if (zoom > 13 && zoom < 16){
+                        heatmap.set('radius', zoom*5);
+                    } else {
+                        heatmap.set('radius', zoom); 
+                        heatmap.set('dissipating', true); 
+                    }
+                }
             });
         })
         
