@@ -50,16 +50,15 @@
             border-radius: 20px;
         }
         #mycanvas{
-            top: -3%;
+            top: -5%;
             left: 4%;
             position: absolute;
             z-index: 3;
-            height: 450px;    
+            height: 550px;    
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   </head>
-    
     <canvas id="mycanvas">
         <script type="text/javascript">
             var c=document.getElementById("mycanvas");
@@ -67,12 +66,14 @@
             // Turn transparency on
             ctx.globalAlpha=0.2;
             ctx.fillStyle="blue"; 
-            ctx.fillRect(0,40,100,350); 
+            ctx.fillRect(0,40,80,450); 
         </script>
+        
     </canvas>
     <div id="floating-panel">
+     <img src="logo.png" width="50%" height="50%">
       <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
-      <div> <input id="navto"></input> <button onclick="navToAddress()">navigate to</button></div><br>
+      <div> <input id="navto"></input> <button id = "custom2" onclick="navToAddress()"><i class="fa fa-car" aria-hidden="true"></i>&nbsp; &nbsp;Navigate To</button></div><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
       <button id = "custom" onclick="meters()">Get meters</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
