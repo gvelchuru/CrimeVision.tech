@@ -1,14 +1,12 @@
 import csv
-import json
 from collections import OrderedDict
 
-import autosklearn.classification
-from sklearn import metrics
-
 import joblib
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
 import numpy as np
+from sklearn import metrics
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
 
 # response_dict = json.load(open('initial_response_data.json'))
 # print('kurwa')
@@ -112,6 +110,7 @@ with open('Seattle_Police_Department_Police_Report_Incident.csv') as report_csv:
 #             data[index] += 1
 
 print('Training...')
+# classifier = KNeighborsClassifier(n_jobs=-1)
 classifier = KNeighborsClassifier(n_jobs=-1)
 # classifier = autosklearn.classification.AutoSklearnClassifier()
 data = list(lat_long_dict.keys())
@@ -119,7 +118,8 @@ target = list(lat_long_dict.values())
 X_train, X_test, y_train, y_test = train_test_split(data, target, test_size=0.1)
 classifier.fit(X_train, y_train)
 joblib.dump(classifier, 'model.pkl')
+out_file = open('out_file.txt', 'w')
 predicted = classifier.predict(X_test)
-print(metrics.classification_report(y_test, predicted))
+out_file.write(metrics.classification_report(y_test, predicted))
 
 
