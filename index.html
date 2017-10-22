@@ -49,23 +49,46 @@
             background-color: yellow;
             border-radius: 20px;
         }
+        #mycanvas{
+            top: 3%;
+            left: 4%;
+            position: absolute;
+            z-index: 3;
+            height: 350px;    
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   </head>
-
+    
+    <canvas id="mycanvas">
+        <script type="text/javascript">
+            var c=document.getElementById("mycanvas");
+            var ctx=c.getContext("2d");
+            // Turn transparency on
+            ctx.globalAlpha=0.2;
+            ctx.fillStyle="blue"; 
+            ctx.fillRect(0,40,100,350); 
+        </script>
+    </canvas>
     <div id="floating-panel">
-      <div> <input id="address"></input> <button onclick="goToAddress()">search</button></div>
+      <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
       <div> <input id="navto"></input> <button onclick="navToAddress()">navigate to</button></div><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
-      <button id = "custom" onclick="meters()">Get meters</button><br>
+      <button id = "custom" onclick="meters()">Get ass</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       <br><select onChange="display_different_crimes()">
         <option value="mostRecent">Most Recent 50000</option>
+<<<<<<< HEAD
         <option value="50000more">50000 - 100000</option>
         <option value="50000more">100000 - 150000</option>
         <option value="50000more">150000 - 200000</option>
         <option value="50000more">200000 - 250000</option>
       </select> 
+=======
+        <option value="older50000">50000 - 100000</option>
+      </select> <br>
+      <input type = "range" min="0" max="15" value="15" oninput="updateTimeHeatMap(value)">
+>>>>>>> 28c2d241720385f7081f141e7712537956314b10
       <!--button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button-->
@@ -73,8 +96,6 @@
     
 
 
-
-    <div id="floating"> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
     
     <div id="map"></div>
 
@@ -234,6 +255,30 @@
 
       }
 
+      function updateTimeHeatMap(val) {
+        heat_crimes = [];
+        for (j = 0; j < val; j++) {
+          get_crimes(numberOfCrimes, j * 50000, function(data) {
+            for(i = 0; i < data.length; i++) {
+                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
+                heat_crimes.push(crime_loc_pos)
+            }
+        })
+        }
+        heatmap.set('data', heat_crimes)
+      }
+
+
+      function updateCrimeHeatMap() {
+        get_crimes(numberOfCrimes, offset, function(data) {
+            for(i = 0; i < data.length; i++) {
+                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
+                crimes.push(crime_loc_pos)
+            }
+            offset += 50000;
+        })
+      }
+      
       function goToAddress() {
         geocoder.geocode( { 'address' : $('#address').val() }, function( results, status ) {
             if( status == google.maps.GeocoderStatus.OK ) {
