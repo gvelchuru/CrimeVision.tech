@@ -45,6 +45,7 @@
     <div id="floating-panel">
       <button onclick="toggleHeatmap()">Toggle Heatmap</button>
       <button onclick="meters()">Get meters</button>
+      <button onclick="toggleMarkers()">Toggle markers</button>
       <!--button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button-->
@@ -60,6 +61,8 @@
       // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
 
       var map, heatmap, geocoder;
+      var markers = [];
+      var showMarkers = true;
 
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -254,11 +257,13 @@
             position: {lat: data["Latitude"], lng: data["Longitude"]},
             map: map, 
             icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+            visible: showMarkers
 
         });
         marker.addListener('click', function() {
           infowindow.open(map, marker);
         });
+        markers.push(marker);
       }
       
       function generate_info(data) {
@@ -279,11 +284,13 @@
         var marker = new google.maps.Marker({ 
             position: {lat: data.geometry.location.lat(), lng: data.geometry.location.lng()},
             icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-            map: map
+            map: map,
+            visible: showMarkers
         });
         marker.addListener('click', function() {
           infowindow.open(map, marker);
         });
+        markers.push(marker);
       }
       
       function generate_park_info(data) {
@@ -294,6 +301,14 @@
         contentString += '</ul></div>'
         return contentString;
       }
+      
+      function toggleMarkers() {
+        showMarkers = !showMarkers;
+        for(i = 0; i < markers.length; i++) {
+            markers[i].setVisible(showMarkers);
+        }
+      }
+
       
     </script>
     <script async defer
