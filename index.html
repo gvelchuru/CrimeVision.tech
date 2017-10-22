@@ -98,7 +98,8 @@
 
     <script type="text/javascript" src="shineapirequests.js"></script> 
     <script type="text/javascript" src="spdapirequests.js"></script>
-    <script type="text/javascript" src="predictionRequests.js"></script>  
+    <script type="text/javascript" src="predictionRequests.js"></script>
+    <script type="text/javascript" src="predictionResultsRequests.js"></script>  
     <script type='text/javascript'>
       function display_different_crimes()
       {
@@ -154,15 +155,24 @@
                 makeMarker(data[i]);
             }
         })
+        
+        good_indeces = []
+
+        get_values(function(data) {
+          for (i = 0; i < data.length; i++) {
+            if (data[i] != 0) {
+              good_indeces.push(i)
+            }
+          }
+        })
 
         get_predictions(function(data) {
           predicts = []
-          console.log("once there was a man from nantucket");
-          for (i = 0; i < data.length; i++) {
-              predicted_pos = new google.maps.LatLng(data[i][0], data[i][1])
-              predicts.push(predicted_pos)
-            
+          for (i = 0; i < good_indeces.length; i++) {
+            predicted_vals = new google.maps.LatLng(data[good_indeces[i]][0], data[good_indeces[i]][1])
+            predicts.push(predicted_vals)
           }
+          
           var grad = [
           'rgba(0, 255, 255, 0)',
           'rgba(0, 255, 255, 1)',
@@ -183,17 +193,17 @@
 
                 data: predicts,
                 map: map,
-                radius: 200,
+                radius: 20,
                 gradient: grad
           });
         })
-
+        
         function crime_callback(data) {
           for(i = 0; i < data.length; i++) {
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 crimes.push(crime_loc_pos)
             }
-            
+
             if (offset < offset_num) {
               heatmap = new google.maps.visualization.HeatmapLayer({
                 data: crimes,
