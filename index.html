@@ -49,6 +49,7 @@
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button-->
     </div>
+    <div> <input default="enter an address"></input> <button>search</button></div><br>
     <div id="map"></div>
     <script type="text/javascript" src="shineapirequests.js"></script> 
     <script type="text/javascript" src="spdapirequests.js"></script>
@@ -229,9 +230,9 @@
       }
       
       function makeParkMarker(data) {
-        //contentString = generate_info(data);
+        contentString = generate_park_info(data);
         var infowindow = new google.maps.InfoWindow({
-          //content: contentString
+          content: contentString
         });
         //console.log(data);
         var marker = new google.maps.Marker({ 
@@ -239,9 +240,18 @@
             icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
             map: map
         });
-        /*marker.addListener('click', function() {
+        marker.addListener('click', function() {
           infowindow.open(map, marker);
-        });*/
+        });
+      }
+      
+      function generate_park_info(data) {
+        contentString = '<div><ul>'
+        contentString += '<li>Name: ' + data.name + '</li>'
+        contentString += '<li>Rating: ' + data.rating + '</li>'
+        contentString += '<li>Vicinity: ' + data.vicinity + '</li>'
+        contentString += '</ul></div>'
+        return contentString;
       }
       
     </script>
