@@ -44,9 +44,10 @@
   <body>
     <div id="floating-panel">
       <button onclick="toggleHeatmap()">Toggle Heatmap</button>
-      <button onclick="changeGradient()">Change gradient</button>
+      <button onclick="meters()">Get meters</button>
+      <!--button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
-      <button onclick="changeOpacity()">Change opacity</button>
+      <button onclick="changeOpacity()">Change opacity</button-->
     </div>
     <div id="map"></div>
     <script type="text/javascript" src="shineapirequests.js"></script> 
@@ -62,7 +63,7 @@
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
           zoom: 13,
-          center: {lat: 37.775, lng: -122.434},
+          center: {lat: 47.6062, lng: -122.3321},
           mapTypeId: 'satellite'
         });
 
@@ -70,10 +71,7 @@
         
         get_meters(map.center.lat(), map.center.lng(), function(data) {
             for(i = 0; i < data.length; i++) {
-                new google.maps.Marker({ 
-                    position: {lat: data[i]["Latitude"], lng: data[i]["Longitude"]},
-                    map: map
-                });
+                makeMarker(data[i]);
             }
         })
 
@@ -88,8 +86,58 @@
               map: map
             });
         })
-      }
+        
+        placeService = new google.maps.places.PlacesService(map);
+        var request = {
+            location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
+            radius: 500, 
+            type: "parking"
+        }
+        placeService.nearbySearch(request, process);
+        
+        function process(data, status, pagination) {
+           if (status !== google.maps.places.PlacesServiceStatus.OK) {
+              return;
+           }
+           for(i = 0; i < data.length; i++) {
+                makeParkMarker(data[i]);
+           }
+           if (pagination.hasNextPage) {
+                //sleep:2;
+                console.log(pagination.nextPage());
+           }
+        }
+        
+        google.maps.event.addListener(map, 'dragend', function() { get_meters(map.center.lat(), map.center.lng(), function(data) {
+            for(i = 0; i < data.length; i++) {
+                makeMarker(data[i]);
+                var request = {
+                    location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
+                    radius: 500, 
+                    type: "parking"
+                }
+                placeService.nearbySearch(request, process);
+            }
+        }) } );
 
+      }
+        
+      /*function get_parking(callback) {
+        lat = map.center.lat();
+        lng = map.center.lng();
+        let options = {
+          "url": "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+lat+","+lng+"&radius=500&types=parking&sensor=false&key=AIzaSyCtwJcWulORFOV0zq7CFPXjkq85G6Ax8lY",
+          "method": "GET",
+          "dataType": 'json',
+          "processData": false
+        }
+        console.log("here")
+
+        $.ajax(options).done((response)=>{
+            success: callback(response)
+        })
+      } */
+      
       function toggleHeatmap() {
         heatmap.setMap(heatmap.getMap() ? null : map);
       }
@@ -122,15 +170,65 @@
         heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
       }
 
+      function meters() {
+        get_meters(map.center.lat(), map.center.lng(), function(data) {
+            for(i = 0; i < data.length; i++) {
+                makeMarker(data[i]);
+            }
+        })
+      }
+      
       // Heatmap data: 500 Points, use lat long from SPD data
       function getPoints() {
         return [
           new google.maps.LatLng(37.782551, -122.445368)
         ];
       }
+      function makeMarker(data) {
+        contentString = generate_info(data);
+        var infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+        
+        var marker = new google.maps.Marker({ 
+            position: {lat: data["Latitude"], lng: data["Longitude"]},
+            map: map, 
+            icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+
+        });
+        marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });
+      }
+      
+      function generate_info(data) {
+        contentString = '<div><ul>'
+        contentString += '<li>Meter ID: ' + data["Meter_ID"] + '</li>'
+        contentString += '<li>Hours: ' + data["Hours_of_Operation"] + '</li>'
+        contentString += '<li>Area: ' + data["Area"] + '</li>'
+        contentString += '</ul></div>'
+        return contentString;
+      }
+      
+      function makeParkMarker(data) {
+        //contentString = generate_info(data);
+        var infowindow = new google.maps.InfoWindow({
+          //content: contentString
+        });
+        //console.log(data);
+        var marker = new google.maps.Marker({ 
+            position: {lat: data.geometry.location.lat(), lng: data.geometry.location.lng()},
+            icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+            map: map
+        });
+        /*marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });*/
+      }
+      
     </script>
     <script async defer
-        src= "https://maps.googleapis.com/maps/api/js?key=AIzaSyCtwJcWulORFOV0zq7CFPXjkq85G6Ax8lY &libraries=visualization&callback=initMap">
+        src= "https://maps.googleapis.com/maps/api/js?key=AIzaSyCtwJcWulORFOV0zq7CFPXjkq85G6Ax8lY &libraries=visualization,places&callback=initMap">
     </script>
   </body>
 </html>
