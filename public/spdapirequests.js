@@ -1,5 +1,5 @@
 function get_crimes_url() {
-	url = "https://data.seattle.gov/resource/policereport.json?$limit=50000"
+	url = "https://data.seattle.gov/resource/policereport.json?$limit=100000"
 	return url
 }
 
