@@ -8,31 +8,31 @@
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 90%;
+        height: 100%;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
         height: 100%;
       }
       #floating-panel {
-        position: absolute;
-        top: 120px;
-        left: 5%;
+        position: relative;
+        top: 10%;
+        left: 0%;
         z-index: 3;
         text-align: center;
         font-family: 'Roboto','sans-serif';
-        line-height: 30px;
+        line-height: 25px;
         border-color: aqua;
       }
       #floating-panel {
         left: 5%;
         position: absolute;
-        top: 120px;
+        top: 20%;
         z-index: 3;
       }
         #floating{
             position: absolute;
-        top: 80px;
+        top: 14%;
         left: 5%;
         z-index: 3;
         text-align: center;
@@ -49,23 +49,61 @@
             background-color: yellow;
             border-radius: 20px;
         }
+        #mycanvas{
+            top: -3%;
+            left: 4%;
+            position: absolute;
+            z-index: 3;
+            height: 450px;    
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   </head>
-
-  <body>
+    
+    <canvas id="mycanvas">
+        <script type="text/javascript">
+            var c=document.getElementById("mycanvas");
+            var ctx=c.getContext("2d");
+            // Turn transparency on
+            ctx.globalAlpha=0.2;
+            ctx.fillStyle="blue"; 
+            ctx.fillRect(0,40,100,350); 
+        </script>
+    </canvas>
     <div id="floating-panel">
+      <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
+      <div> <input id="navto"></input> <button onclick="navToAddress()">navigate to</button></div><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
       <button id = "custom" onclick="meters()">Get meters</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
+      <br><select onChange="display_different_crimes()">
+        <option value="mostRecent">Most Recent 50000</option>
+        <option value="50000more">50000 - 100000</option>
+        <option value="50000more">100000 - 150000</option>
+        <option value="50000more">150000 - 200000</option>
+        <option value="50000more">200000 - 250000</option>
+        <option value="older50000">50000 - 100000</option>
+      </select> 
+<br>
+      <input type = "range" min="0" max="15" value="15" oninput="updateTimeHeatMap(value)">
       <!--button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button-->
     </div>
-    <div id="floating"> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
+    
+
+
+    
     <div id="map"></div>
+
     <script type="text/javascript" src="shineapirequests.js"></script> 
     <script type="text/javascript" src="spdapirequests.js"></script>
+    <script type='text/javascript'>
+      function display_different_crimes()
+      {
+          updateCrimeHeatMap();
+      }
+    </script>
     <script>
 
       // This example requires the Visualization library. Include the libraries=visualization
@@ -75,8 +113,14 @@
       var map, heatmap, geocoder;
       var markers = [];
       var showMarkers = true;
+      var directionsService;
+      var offset_num = 10000;
+      var numberOfCrimes = offset_num;
+      var offset = 0;
+      var crimes = [];
 
       function initMap() {
+        
         map = new google.maps.Map(document.getElementById('map'), {
           zoom: 16,
           // get user loc to replace center
@@ -84,7 +128,25 @@
           mapTypeId: 'satellite'
         });
 
-        
+        //sets location to currently but weirdly inaccurate....
+        /*navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            map.setCenter(pos);
+            get_meters(map.center.lat(), map.center.lng(), function(data) {
+            for(i = 0; i < data.length; i++) {
+                makeMarker(data[i]);
+                var request = {
+                    location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
+                    radius: 500, 
+                    type: "parking"
+                }
+                placeService.nearbySearch(request, process);
+            }
+            })
+        });*/
         
         get_meters(map.center.lat(), map.center.lng(), function(data) {
             for(i = 0; i < data.length; i++) {
@@ -92,35 +154,67 @@
             }
         })
 
-        get_crimes(function(data) {
-            crime_location = []
-            for(i = 0; i < data.length; i++) {
+        function crime_callback(data) {
+          for(i = 0; i < data.length; i++) {
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
-                crime_location.push(crime_loc_pos)
+                crimes.push(crime_loc_pos)
             }
-            heatmap = new google.maps.visualization.HeatmapLayer({
-              data: crime_location,
-              map: map,
-              radius: 200,
-            });
-
-            google.maps.event.addListener(map, 'zoom_changed', function(){
-                if (heatmap){
-                    var zoom = map.getZoom();
-                    console.log(zoom) // zoom inc as you zoom in
-                    if (zoom >= 16){
-                        heatmap.set('radius', zoom*13);
-                        heatmap.set('dissipating', true);
-                    } else if (zoom > 13 && zoom < 16){
-                        heatmap.set('radius', zoom*5);
-                    } else {
-                        heatmap.set('radius', zoom); 
-                        heatmap.set('dissipating', true); 
-                    }
+            /*google.maps.event.addListener(map, 'zoom_changed', function(){
+                  if (heatmap){
+                      var zoom = map.getZoom();
+                      console.log(zoom) // zoom inc as you zoom in
+                      if (zoom >= 16){
+                          heatmap.set('radius', zoom*13);
+                          heatmap.set('dissipating', true);
+                      } else if (zoom > 13 && zoom < 16){
+                          heatmap.set('radius', zoom*5);
+                      } else {
+                          heatmap.set('radius', zoom); 
+                          heatmap.set('dissipating', true); 
+                      }
+                  }
                 }
-            });
-        })
-        
+            );*/
+            if (offset < offset_num) {
+              heatmap = new google.maps.visualization.HeatmapLayer({
+                data: crimes,
+                map: map,
+                radius: 200,
+              });
+              google.maps.event.addListener(map, 'zoom_changed', function(){
+                  if (heatmap){
+                      console.log("addListener")
+                      var zoom = map.getZoom();
+                      console.log(zoom) // zoom inc as you zoom in
+                      if (zoom >= 16){
+                          heatmap.set('radius', zoom*13);
+                          heatmap.set('dissipating', true);
+                      } else if (zoom > 13 && zoom < 16){
+                          heatmap.set('radius', zoom*5);
+                      } else {
+                          heatmap.set('radius', zoom); 
+                          heatmap.set('dissipating', true); 
+                      }
+                  }
+                }
+              );
+            }
+              
+            else {
+              console.log("Hello")
+              heatmap.setData(crimes)
+              console.log("Bye")
+            }
+            offset += offset_num;
+            if (offset < offset_num) {
+              get_crimes(numberOfCrimes, offset, crime_callback);
+            }
+
+            console.log("crime_callback")
+        }
+
+        get_crimes(numberOfCrimes, offset, crime_callback)
+
         placeService = new google.maps.places.PlacesService(map);
         var request = {
             location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
@@ -155,20 +249,121 @@
           });});
         
         geocoder = new google.maps.Geocoder();
+        directionsService = new google.maps.DirectionsService;
 
+      }
+
+      function updateTimeHeatMap(val) {
+        
+        var willSetData = new Promise(
+          function(resolve, reject) {
+            if (heat_crimes.length > offset_num - 1) {
+              heatmap.setData(heat_crimes);
+              resolve(heat_crimes);
+            } else {
+              var reason = new Error("Heat crimes was sent before fully loaded");
+              reject(reason);
+            }
+          }
+        );
+        heat_crimes = [];
+        for (j = 0; j < val; j++) {
+          get_crimes(numberOfCrimes, j * offset_num, function(data) {
+            for(i = 0; i < data.length; i++) {
+                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
+                heat_crimes.push(crime_loc_pos)
+
+            }
+            heatmap.setData(heat_crimes)
+          })
+        }
+        console.log("About to set data")
+        var set = function() {
+          willSetData
+            .then(function(fulfilled) {
+              console.log("Fulfilled")
+            })
+            .catch(function(error) {
+              console.log("heat_crimes was not done")
+            })
+        }
+        set();
+        
+        console.log("Setted data")
+      }
+
+
+      function updateCrimeHeatMap() {
+        get_crimes(numberOfCrimes, offset, function(data) {
+            for(i = 0; i < data.length; i++) {
+                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
+                crimes.push(crime_loc_pos)
+            }
+            offset += offset_num;
+        })
       }
       
       function goToAddress() {
-        
         geocoder.geocode( { 'address' : $('#address').val() }, function( results, status ) {
             if( status == google.maps.GeocoderStatus.OK ) {
 
-                //In this case it creates a marker, but you can get the lat and lng from the location.LatLng
                 map.setCenter( results[0].geometry.location );
-                //var marker = new google.maps.Marker( {
-                //    map     : map,
-                //    position: results[0].geometry.location
-                //} );
+
+                function process(data, status, pagination) {
+                   if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                      return;
+                   }
+                   for(i = 0; i < data.length; i++) {
+                        makeParkMarker(data[i]);
+                   }
+                   if (pagination.hasNextPage) {
+                        //sleep:2;
+                        console.log(pagination.nextPage());
+                   }
+                }
+                get_meters(map.center.lat(), map.center.lng(), function(data) {
+                    for(i = 0; i < data.length; i++) {
+                        makeMarker(data[i]);
+                        var request = {
+                            location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
+                            radius: 500, 
+                            type: "parking"
+                        }
+                        placeService.nearbySearch(request, process);
+                        console.log("asdasda");
+                    }
+                })
+            } else {
+                alert( 'Geocode was not successful for the following reason: ' + status );
+            }
+        } );
+      }
+      
+      function navToAddress() {
+        geocoder.geocode( { 'address' : $('#navto').val() }, function( results, status ) {
+            if( status == google.maps.GeocoderStatus.OK ) {
+
+                //map.setCenter( results[0].geometry.location );
+                var directionsDisplay = new google.maps.DirectionsRenderer({map: map});
+                directionsService.route({
+                  origin: $('#address').val(),
+                  destination: $('#navto').val(),
+                  travelMode: 'DRIVING'
+                }, function(response, status) {
+                  // Route the directions and pass the response to a function to create
+                  // markers for each step.
+                  if (status === 'OK') {
+                    //document.getElementById('warnings-panel').innerHTML =
+                    //    '<b>' + response.routes[0].warnings + '</b>';
+                    directionsDisplay.setDirections(response);
+                    //showSteps(response, markerArray, stepDisplay, map);
+                  } else {
+                    window.alert('Directions request failed due to ' + status);
+                  }
+                });
+              
+
+
                 function process(data, status, pagination) {
                    if (status !== google.maps.places.PlacesServiceStatus.OK) {
                       return;
@@ -255,12 +450,7 @@
         })
       }
       
-      // Heatmap data: 500 Points, use lat long from SPD data
-      function getPoints() {
-        return [
-          new google.maps.LatLng(37.782551, -122.445368)
-        ];
-      }
+
       function makeMarker(data) {
         contentString = generate_info(data);
         var infowindow = new google.maps.InfoWindow({
