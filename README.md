@@ -1,5 +1,6 @@
 # CrimeVision.Tech
 To start:
+
 1 - Start MySQL server: 
   >mysql.server start
 
