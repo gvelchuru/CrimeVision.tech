@@ -1,4 +1,5 @@
 import csv
+import random
 from collections import OrderedDict
 
 import joblib
@@ -27,7 +28,7 @@ max_lat = 47.8
 min_long = -122.5
 max_long = -122.2
 
-min_year = 2012
+min_year = 2015
 max_year = 2017
 
 iterate = .001
@@ -62,6 +63,18 @@ with open('Seattle_Police_Department_Police_Report_Incident.csv') as report_csv:
             month = int(row_dict['Month'])
             if year in range(min_year, max_year + 1):
                 lat_long_dict[latitude, longitude, year, month] += 1
+index = 0
+key_list = list(lat_long_dict.keys())
+while True:
+    if index == (2872800 - 3000):
+        break
+    else:
+        i = random.randint(0, len(key_list) - 1)
+        key = key_list[i]
+        if key == 0:
+            index += 1
+            lat_long_dict.pop(key)
+            key_list.pop(i)
 
 # for crime in out_dict:
 #     lat = float(crime['Latitude'])
