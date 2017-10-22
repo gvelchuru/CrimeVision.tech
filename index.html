@@ -66,27 +66,16 @@
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   </head>
-    <canvas id="mycanvas">
-        <script type="text/javascript">
-            var c=document.getElementById("mycanvas");
-            var ctx=c.getContext("2d");
-            // Turn transparency on
-            ctx.globalAlpha=0.4;
-            ctx.fillStyle="blue"; 
-            ctx.fillRect(0,40,90,450); 
-        </script>
-        
-    </canvas>
-    <div id="floating-panel">
-     <img src="logo.png" width="50%" height="50%">
-      <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Starting Point</button></div><br>
+    <div id="floating-panel" style="background-color: rgba(0,0,255,0.5)">
+     <img src="logo.png" width="50%" height="50%" style="margin-top: .5rem">
+      <div style="margin-left: .5rem; margin-right: .5rem"> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Starting Point</button></div><br>
       <div> <input id="navto"></input> <button id = "custom2" onclick="navToAddress()"><i class="fa fa-car" aria-hidden="true"></i>&nbsp; &nbsp;Navigate To</button></div><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
       <button id = "custom" onclick="togglePredictive()">Toggle Predictive Heatmap</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       
      <p>Past &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Future</p>
-      <input type = "range" min="0" max="15" value="15" oninput="updateTimeHeatMap(value)">
+      <input type = "range" min="0" max="15" value="15" oninput="updateTimeHeatMap(value)" style="margin-bottom: .5rem">
       <!--button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button-->
