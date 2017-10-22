@@ -50,11 +50,11 @@
             border-radius: 20px;
         }
         #mycanvas{
-            top: 3%;
+            top: -3%;
             left: 4%;
             position: absolute;
             z-index: 3;
-            height: 350px;    
+            height: 450px;    
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -78,8 +78,14 @@
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       <br><select onChange="display_different_crimes()">
         <option value="mostRecent">Most Recent 50000</option>
+<<<<<<< HEAD
+        <option value="50000more">50000 - 100000</option>
+        <option value="50000more">100000 - 150000</option>
+        <option value="50000more">150000 - 200000</option>
+        <option value="50000more">200000 - 250000</option>
         <option value="older50000">50000 - 100000</option>
-      </select> <br>
+      </select> 
+<br>
       <input type = "range" min="0" max="15" value="15" oninput="updateTimeHeatMap(value)">
       <!--button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
@@ -148,35 +154,67 @@
             }
         })
 
-        get_crimes(numberOfCrimes, offset, function(data) {
-            for(i = 0; i < data.length; i++) {
+        function crime_callback(data) {
+          for(i = 0; i < data.length; i++) {
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 crimes.push(crime_loc_pos)
             }
-            heatmap = new google.maps.visualization.HeatmapLayer({
-              data: crimes,
-              map: map,
-              radius: 200,
-            });
-
-            google.maps.event.addListener(map, 'zoom_changed', function(){
-                if (heatmap){
-                    var zoom = map.getZoom();
-                    console.log(zoom) // zoom inc as you zoom in
-                    if (zoom >= 16){
-                        heatmap.set('radius', zoom*13);
-                        heatmap.set('dissipating', true);
-                    } else if (zoom > 13 && zoom < 16){
-                        heatmap.set('radius', zoom*5);
-                    } else {
-                        heatmap.set('radius', zoom); 
-                        heatmap.set('dissipating', true); 
-                    }
+            /*google.maps.event.addListener(map, 'zoom_changed', function(){
+                  if (heatmap){
+                      var zoom = map.getZoom();
+                      console.log(zoom) // zoom inc as you zoom in
+                      if (zoom >= 16){
+                          heatmap.set('radius', zoom*13);
+                          heatmap.set('dissipating', true);
+                      } else if (zoom > 13 && zoom < 16){
+                          heatmap.set('radius', zoom*5);
+                      } else {
+                          heatmap.set('radius', zoom); 
+                          heatmap.set('dissipating', true); 
+                      }
+                  }
                 }
-            });
+            );*/
+            if (offset < 50000) {
+              heatmap = new google.maps.visualization.HeatmapLayer({
+                data: crimes,
+                map: map,
+                radius: 200,
+              });
+              google.maps.event.addListener(map, 'zoom_changed', function(){
+                  if (heatmap){
+                      console.log("addListener")
+                      var zoom = map.getZoom();
+                      console.log(zoom) // zoom inc as you zoom in
+                      if (zoom >= 16){
+                          heatmap.set('radius', zoom*13);
+                          heatmap.set('dissipating', true);
+                      } else if (zoom > 13 && zoom < 16){
+                          heatmap.set('radius', zoom*5);
+                      } else {
+                          heatmap.set('radius', zoom); 
+                          heatmap.set('dissipating', true); 
+                      }
+                  }
+                }
+              );
+            }
+              
+            else {
+              console.log("Hello")
+              heatmap.setData(crimes)
+              console.log("Bye")
+            }
             offset += 50000;
-        })
-        
+            if (offset < 50000) {
+              get_crimes(numberOfCrimes, offset, crime_callback);
+            }
+
+            console.log("crime_callback")
+        }
+
+        get_crimes(numberOfCrimes, offset, crime_callback)
+
         placeService = new google.maps.places.PlacesService(map);
         var request = {
             location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
@@ -214,17 +252,44 @@
         directionsService = new google.maps.DirectionsService;
 
       }
+
       function updateTimeHeatMap(val) {
+        
+        var willSetData = new Promise(
+          function(resolve, reject) {
+            if (heat_crimes.length > 49999) {
+              heatmap.setData(heat_crimes);
+              resolve(heat_crimes);
+            } else {
+              var reason = new Error("Heat crimes was sent before fully loaded");
+              reject(reason);
+            }
+          }
+        );
         heat_crimes = [];
         for (j = 0; j < val; j++) {
           get_crimes(numberOfCrimes, j * 50000, function(data) {
             for(i = 0; i < data.length; i++) {
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 heat_crimes.push(crime_loc_pos)
+
             }
-        })
+            heatmap.setData(heat_crimes)
+          })
         }
-        heatmap.set('data', heat_crimes)
+        console.log("About to set data")
+        var set = function() {
+          willSetData
+            .then(function(fulfilled) {
+              console.log("Fulfilled")
+            })
+            .catch(function(error) {
+              console.log("heat_crimes was not done")
+            })
+        }
+        set();
+        
+        console.log("Setted data")
       }
 
 
@@ -237,6 +302,7 @@
             offset += 50000;
         })
       }
+      
       function goToAddress() {
         geocoder.geocode( { 'address' : $('#address').val() }, function( results, status ) {
             if( status == google.maps.GeocoderStatus.OK ) {
@@ -384,7 +450,7 @@
         })
       }
       
-      
+
       function makeMarker(data) {
         contentString = generate_info(data);
         var infowindow = new google.maps.InfoWindow({
