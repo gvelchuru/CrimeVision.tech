@@ -14,6 +14,11 @@
       html, body {
         height: 100%;
       }
+        p{
+            color: white;
+            font-family: 'Roboto','sans-serif';
+            line-height: 10px;
+        }
       #floating-panel {
         position: relative;
         top: 10%;
@@ -38,23 +43,25 @@
         text-align: center;
         font-family: 'Roboto','sans-serif';
         line-height: 30px;
-        border-color: aqua;
-            
         }
         #custom{
-            background-color: aqua;
-            border-radius: 20px;
+            background-color: #2E3192;
+            border-radius: 5px;
+            border-color: transparent;
+            color: white;
         }
         #custom2{
-            background-color: yellow;
-            border-radius: 20px;
+            background-color: #0F145B;
+            border-radius: 5px;
+            border-color: transparent;
+            color: white;
         }
         #mycanvas{
-            top: -5%;
+            top: -10%;
             left: 4%;
             position: absolute;
             z-index: 3;
-            height: 550px;    
+            height: 650px;
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -72,10 +79,12 @@
     </canvas>
     <div id="floating-panel">
      <img src="logo.png" width="50%" height="50%">
-      <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
+      <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Starting Point</button></div><br>
       <div> <input id="navto"></input> <button id = "custom2" onclick="navToAddress()"><i class="fa fa-car" aria-hidden="true"></i>&nbsp; &nbsp;Navigate To</button></div><br>
+      <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br><br>
+      <button id = "custom" onclick="meters()">Get meters</button><br><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
-      <button id = "custom" onclick="meters()">Get meters</button><br>
+      <button id = "custom" onclick="togglePredictive()">Toggle Predictive Heatmap</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       <br><select onChange="display_different_crimes()">
         <option value="mostRecent">Most Recent 50000</option>
@@ -86,6 +95,7 @@
         <option value="older50000">50000 - 100000</option>
       </select> 
 <br>
+     <p>Past &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Future</p>
       <input type = "range" min="0" max="15" value="15" oninput="updateTimeHeatMap(value)">
       <!--button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
@@ -115,7 +125,7 @@
 
       var map, heatmap, predicted_heatmap, geocoder;
       var markers = [];
-      var showMarkers = true;
+      var showMarkers = false;
       var directionsService;
       var offset_num = 10000;
       var numberOfCrimes = offset_num;
@@ -125,10 +135,11 @@
       function initMap() {
         
         map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 16,
+          zoom: 14,
           // get user loc to replace center
           center: {lat: 47.6062, lng: -122.3321}, // current location is seattle
-          mapTypeId: 'satellite'
+          mapTypeId: 'satellite',
+          minZoom: 14
         });
 
         //sets location to currently but weirdly inaccurate....
@@ -155,9 +166,9 @@
             for(i = 0; i < data.length; i++) {
                 makeMarker(data[i]);
             }
-        });
-
-          good_indeces = [];
+        })
+        
+        good_indeces = []
 
         get_values(function(data) {
           for (i = 0; i < data.length; i++) {
@@ -168,7 +179,7 @@
         });
 
         get_predictions(function(data) {
-            predicts = [];
+          predicts = []
           for (i = 0; i < good_indeces.length; i++) {
               predicted_vals = new google.maps.LatLng(data[good_indeces[i]][0], data[good_indeces[i]][1]);
             predicts.push(predicted_vals)
@@ -197,8 +208,9 @@
                 radius: 20,
                 gradient: grad
           });
+        })
         });
-        
+
         function crime_callback(data) {
           for(i = 0; i < data.length; i++) {
               crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude']);
@@ -213,18 +225,18 @@
               });
               google.maps.event.addListener(map, 'zoom_changed', function(){
                   if (heatmap){
-                      console.log("addListener");
+                      console.log("addListener")
                       var zoom = map.getZoom();
-                      console.log(zoom); // zoom inc as you zoom in
-                      if (zoom >= 16){
+                      console.log(zoom) // zoom inc as you zoom in
+                      if (zoom > 16){
                           heatmap.set('radius', zoom*13);
-                          heatmap.set('dissipating', true);
-                      } else if (zoom > 13 && zoom < 16){
-                          heatmap.set('radius', zoom*5);
+                      } else if (zoom <= 16 && zoom > 14) {
+                          heatmap.set('radius', zoom*4);
                       } else {
                           heatmap.set('radius', zoom); 
-                          heatmap.set('dissipating', true); 
+
                       }
+                      heatmap.set('dissipating', true);
                   }
                 }
               );
@@ -442,6 +454,10 @@
       
       function toggleHeatmap() {
         heatmap.setMap(heatmap.getMap() ? null : map);
+      }
+
+      function togglePredictive() {
+        predicted_heatmap.setMap(predicted_heatmap.getMap() ? null : map);
       }
 
       function changeGradient() {
