@@ -155,9 +155,9 @@
             for(i = 0; i < data.length; i++) {
                 makeMarker(data[i]);
             }
-        })
-        
-        good_indeces = []
+        });
+
+          good_indeces = [];
 
         get_values(function(data) {
           for (i = 0; i < data.length; i++) {
@@ -165,12 +165,12 @@
               good_indeces.push(i)
             }
           }
-        })
+        });
 
         get_predictions(function(data) {
-          predicts = []
+            predicts = [];
           for (i = 0; i < good_indeces.length; i++) {
-            predicted_vals = new google.maps.LatLng(data[good_indeces[i]][0], data[good_indeces[i]][1])
+              predicted_vals = new google.maps.LatLng(data[good_indeces[i]][0], data[good_indeces[i]][1]);
             predicts.push(predicted_vals)
           }
           
@@ -189,7 +189,7 @@
           'rgba(127, 0, 63, 1)',
           'rgba(191, 0, 31, 1)',
           'rgba(255, 0, 0, 1)'
-          ]
+          ];
           predicted_heatmap = new google.maps.visualization.HeatmapLayer({
 
                 data: predicts,
@@ -197,11 +197,11 @@
                 radius: 20,
                 gradient: grad
           });
-        })
+        });
         
         function crime_callback(data) {
           for(i = 0; i < data.length; i++) {
-                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
+              crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude']);
                 crimes.push(crime_loc_pos)
             }
 
@@ -213,9 +213,9 @@
               });
               google.maps.event.addListener(map, 'zoom_changed', function(){
                   if (heatmap){
-                      console.log("addListener")
+                      console.log("addListener");
                       var zoom = map.getZoom();
-                      console.log(zoom) // zoom inc as you zoom in
+                      console.log(zoom); // zoom inc as you zoom in
                       if (zoom >= 16){
                           heatmap.set('radius', zoom*13);
                           heatmap.set('dissipating', true);
@@ -231,8 +231,8 @@
             }
               
             else {
-              console.log("Hello")
-              heatmap.setData(crimes)
+                console.log("Hello");
+                heatmap.setData(crimes);
               console.log("Bye")
             }
             offset += offset_num;
@@ -243,14 +243,14 @@
             console.log("crime_callback")
         }
 
-        get_crimes(numberOfCrimes, offset, crime_callback)
+          get_crimes(numberOfCrimes, offset, crime_callback);
 
         placeService = new google.maps.places.PlacesService(map);
         var request = {
             location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
             radius: 500, 
             type: "parking"
-        }
+        };
         placeService.nearbySearch(request, process);
         
         function process(data, status, pagination) {
@@ -273,7 +273,7 @@
                     location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
                     radius: 500, 
                     type: "parking"
-                }
+                };
                 placeService.nearbySearch(request, process);
             }
           });});
@@ -284,7 +284,7 @@
       }
 
       function updateTimeHeatMap(val) {
-        
+          map = null;
         var willSetData = new Promise(
           function(resolve, reject) {
             if (heat_crimes.length > offset_num - 1) {
@@ -300,14 +300,14 @@
         for (j = 0; j < val; j++) {
           get_crimes(numberOfCrimes, j * offset_num, function(data) {
             for(i = 0; i < data.length; i++) {
-                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
+                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude']);
                 heat_crimes.push(crime_loc_pos)
 
             }
             heatmap.setData(heat_crimes)
           })
         }
-        console.log("About to set data")
+          console.log("About to set data");
         var set = function() {
           willSetData
             .then(function(fulfilled) {
@@ -316,7 +316,7 @@
             .catch(function(error) {
               console.log("heat_crimes was not done")
             })
-        }
+        };
         set();
         
         console.log("Setted data")
@@ -326,7 +326,7 @@
       function updateCrimeHeatMap() {
         get_crimes(numberOfCrimes, offset, function(data) {
             for(i = 0; i < data.length; i++) {
-                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
+                crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude']);
                 crimes.push(crime_loc_pos)
             }
             offset += offset_num;
@@ -358,7 +358,7 @@
                             location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
                             radius: 500, 
                             type: "parking"
-                        }
+                        };
                         placeService.nearbySearch(request, process);
                         console.log("asdasda");
                     }
@@ -413,7 +413,7 @@
                             location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
                             radius: 500, 
                             type: "parking"
-                        }
+                        };
                         placeService.nearbySearch(request, process);
                         console.log("asdasda");
                     }
@@ -460,7 +460,7 @@
           'rgba(127, 0, 63, 1)',
           'rgba(191, 0, 31, 1)',
           'rgba(255, 0, 0, 1)'
-        ]
+        ];
         heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
       }
 
@@ -501,11 +501,11 @@
       }
       
       function generate_info(data) {
-        contentString = '<div><ul>'
-        contentString += '<li>Meter ID: ' + data["Meter_ID"] + '</li>'
-        contentString += '<li>Hours: ' + data["Hours_of_Operation"] + '</li>'
-        contentString += '<li>Area: ' + data["Area"] + '</li>'
-        contentString += '</ul></div>'
+          contentString = '<div><ul>';
+          contentString += '<li>Meter ID: ' + data["Meter_ID"] + '</li>';
+          contentString += '<li>Hours: ' + data["Hours_of_Operation"] + '</li>';
+          contentString += '<li>Area: ' + data["Area"] + '</li>';
+          contentString += '</ul></div>';
         return contentString;
       }
       
@@ -528,11 +528,11 @@
       }
       
       function generate_park_info(data) {
-        contentString = '<div><ul>'
-        contentString += '<li>Name: ' + data.name + '</li>'
-        contentString += '<li>Rating: ' + data.rating + '</li>'
-        contentString += '<li>Vicinity: ' + data.vicinity + '</li>'
-        contentString += '</ul></div>'
+          contentString = '<div><ul>';
+          contentString += '<li>Name: ' + data.name + '</li>';
+          contentString += '<li>Rating: ' + data.rating + '</li>';
+          contentString += '<li>Vicinity: ' + data.vicinity + '</li>';
+          contentString += '</ul></div>';
         return contentString;
       }
       
