@@ -3,53 +3,66 @@
   <head>
     <meta charset="utf-8">
     <title>Heatmaps</title>
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 100%;
+        height: 90%;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
         height: 100%;
-        margin: 10;
-        padding: 0;
       }
       #floating-panel {
         position: absolute;
-        top: 10px;
-        left: 25%;
-        z-index: 5;
-        background-color: #fff;
-        padding: 5px;
-        border: 1px solid #999;
+        top: 120px;
+        left: 5%;
+        z-index: 3;
         text-align: center;
         font-family: 'Roboto','sans-serif';
         line-height: 30px;
-        padding-left: 10px;
+        border-color: aqua;
       }
       #floating-panel {
-        background-color: #fff;
-        border: 1px solid #999;
-        left: 25%;
-        padding: 5px;
+        left: 5%;
         position: absolute;
-        top: 10px;
-        z-index: 5;
+        top: 120px;
+        z-index: 3;
       }
+        #floating{
+            position: absolute;
+        top: 80px;
+        left: 5%;
+        z-index: 3;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        border-color: aqua;
+            
+        }
+        #custom{
+            background-color: aqua;
+            border-radius: 20px;
+        }
+        #custom2{
+            background-color: yellow;
+            border-radius: 20px;
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   </head>
 
   <body>
     <div id="floating-panel">
-      <button onclick="toggleHeatmap()">Toggle Heatmap</button>
-      <button onclick="meters()">Get meters</button>
+      <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
+      <button id = "custom" onclick="meters()">Get meters</button><br>
+      <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       <!--button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button-->
     </div>
-    <div> <input id="address"></input> <button onclick="goToAddress()">search</button></div><br>
+    <div id="floating"> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
     <div id="map"></div>
     <script type="text/javascript" src="shineapirequests.js"></script> 
     <script type="text/javascript" src="spdapirequests.js"></script>
@@ -60,6 +73,8 @@
       // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
 
       var map, heatmap, geocoder;
+      var markers = [];
+      var showMarkers = true;
 
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -137,8 +152,10 @@
                 }
                 placeService.nearbySearch(request, process);
             }
-        }) } );
+          });});
+        
         geocoder = new google.maps.Geocoder();
+
       }
       
       function goToAddress() {
@@ -254,11 +271,13 @@
             position: {lat: data["Latitude"], lng: data["Longitude"]},
             map: map, 
             icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+            visible: showMarkers
 
         });
         marker.addListener('click', function() {
           infowindow.open(map, marker);
         });
+        markers.push(marker);
       }
       
       function generate_info(data) {
@@ -279,11 +298,13 @@
         var marker = new google.maps.Marker({ 
             position: {lat: data.geometry.location.lat(), lng: data.geometry.location.lng()},
             icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-            map: map
+            map: map,
+            visible: showMarkers
         });
         marker.addListener('click', function() {
           infowindow.open(map, marker);
         });
+        markers.push(marker);
       }
       
       function generate_park_info(data) {
@@ -294,6 +315,14 @@
         contentString += '</ul></div>'
         return contentString;
       }
+      
+      function toggleMarkers() {
+        showMarkers = !showMarkers;
+        for(i = 0; i < markers.length; i++) {
+            markers[i].setVisible(showMarkers);
+        }
+      }
+
       
     </script>
     <script async defer
