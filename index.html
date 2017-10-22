@@ -49,12 +49,29 @@
             background-color: yellow;
             border-radius: 20px;
         }
+        #mycanvas{
+            top: 3%;
+            left: 4%;
+            position: absolute;
+            z-index: 3;
+            height: 350px;    
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   </head>
-
+    
+    <canvas id="mycanvas">
+        <script type="text/javascript">
+            var c=document.getElementById("mycanvas");
+            var ctx=c.getContext("2d");
+            // Turn transparency on
+            ctx.globalAlpha=0.2;
+            ctx.fillStyle="blue"; 
+            ctx.fillRect(0,40,100,350); 
+        </script>
+    </canvas>
     <div id="floating-panel">
-      <div> <input id="address"></input> <button onclick="goToAddress()">search</button></div>
+      <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
       <div> <input id="navto"></input> <button onclick="navToAddress()">navigate to</button></div><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
       <button id = "custom" onclick="meters()">Get meters</button><br>
@@ -70,8 +87,6 @@
     
 
 
-
-    <div id="floating"> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
     
     <div id="map"></div>
 
