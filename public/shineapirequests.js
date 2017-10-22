@@ -23,7 +23,7 @@ function get_meters_url(lat, lng) {
     url = "https://apis.solarialabs.com/shine/v1/parking-rules/meters?lat="
     url += lat
     url += "&long="+lng
-    url += "&apikey=vyd6xVuOrpFCfkHRF6xETS9km7riggZe"
+    url += "&max-results=10&apikey=vyd6xVuOrpFCfkHRF6xETS9km7riggZe"
     return url
 }    
 
