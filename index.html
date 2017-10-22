@@ -49,7 +49,7 @@
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button-->
     </div>
-    <div> <input default="enter an address"></input> <button>search</button></div><br>
+    <div> <input id="address"></input> <button onclick="goToAddress()">search</button></div><br>
     <div id="map"></div>
     <script type="text/javascript" src="shineapirequests.js"></script> 
     <script type="text/javascript" src="spdapirequests.js"></script>
@@ -59,11 +59,11 @@
       // parameter when you first load the API. For example:
       // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
 
-      var map, heatmap;
+      var map, heatmap, geocoder;
 
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 13,
+          zoom: 16,
           // get user loc to replace center
           center: {lat: 47.6062, lng: -122.3321}, // current location is seattle
           mapTypeId: 'satellite'
@@ -123,9 +123,50 @@
                 placeService.nearbySearch(request, process);
             }
         }) } );
-
+        geocoder = new google.maps.Geocoder();
       }
+      
+      function goToAddress() {
         
+        geocoder.geocode( { 'address' : $('#address').val() }, function( results, status ) {
+            if( status == google.maps.GeocoderStatus.OK ) {
+
+                //In this case it creates a marker, but you can get the lat and lng from the location.LatLng
+                map.setCenter( results[0].geometry.location );
+                //var marker = new google.maps.Marker( {
+                //    map     : map,
+                //    position: results[0].geometry.location
+                //} );
+                function process(data, status, pagination) {
+                   if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                      return;
+                   }
+                   for(i = 0; i < data.length; i++) {
+                        makeParkMarker(data[i]);
+                   }
+                   if (pagination.hasNextPage) {
+                        //sleep:2;
+                        console.log(pagination.nextPage());
+                   }
+                }
+                get_meters(map.center.lat(), map.center.lng(), function(data) {
+                    for(i = 0; i < data.length; i++) {
+                        makeMarker(data[i]);
+                        var request = {
+                            location: new google.maps.LatLng(map.center.lat(), map.center.lng()), 
+                            radius: 500, 
+                            type: "parking"
+                        }
+                        placeService.nearbySearch(request, process);
+                        console.log("asdasda");
+                    }
+                })
+            } else {
+                alert( 'Geocode was not successful for the following reason: ' + status );
+            }
+        } );
+      }
+       
       /*function get_parking(callback) {
         lat = map.center.lat();
         lng = map.center.lng();
