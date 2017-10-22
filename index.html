@@ -178,7 +178,7 @@
           }
         })
 
-        /*get_predictions(function(data) {
+        get_predictions(function(data) {
           predicts = []
           for (i = 0; i < good_indeces.length; i++) {
             predicted_vals = new google.maps.LatLng(data[good_indeces[i]][0], data[good_indeces[i]][1])
@@ -208,7 +208,7 @@
                 radius: 20,
                 gradient: grad
           });
-        })*/
+        })
         
         function crime_callback(data) {
           for(i = 0; i < data.length; i++) {
