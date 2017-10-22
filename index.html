@@ -50,16 +50,15 @@
             border-radius: 20px;
         }
         #mycanvas{
-            top: -3%;
+            top: -5%;
             left: 4%;
             position: absolute;
             z-index: 3;
-            height: 450px;    
+            height: 550px;    
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   </head>
-    
     <canvas id="mycanvas">
         <script type="text/javascript">
             var c=document.getElementById("mycanvas");
@@ -67,12 +66,14 @@
             // Turn transparency on
             ctx.globalAlpha=0.2;
             ctx.fillStyle="blue"; 
-            ctx.fillRect(0,40,100,350); 
+            ctx.fillRect(0,40,80,450); 
         </script>
+        
     </canvas>
     <div id="floating-panel">
+     <img src="logo.png" width="50%" height="50%">
       <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
-      <div> <input id="navto"></input> <button onclick="navToAddress()">navigate to</button></div><br>
+      <div> <input id="navto"></input> <button id = "custom2" onclick="navToAddress()"><i class="fa fa-car" aria-hidden="true"></i>&nbsp; &nbsp;Navigate To</button></div><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
       <button id = "custom" onclick="meters()">Get meters</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
@@ -98,6 +99,8 @@
 
     <script type="text/javascript" src="shineapirequests.js"></script> 
     <script type="text/javascript" src="spdapirequests.js"></script>
+    <script type="text/javascript" src="predictionRequests.js"></script>
+    <script type="text/javascript" src="predictionResultsRequests.js"></script>  
     <script type='text/javascript'>
       function display_different_crimes()
       {
@@ -110,7 +113,7 @@
       // parameter when you first load the API. For example:
       // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
 
-      var map, heatmap, geocoder;
+      var map, heatmap, predicted_heatmap, geocoder;
       var markers = [];
       var showMarkers = true;
       var directionsService;
@@ -153,33 +156,60 @@
                 makeMarker(data[i]);
             }
         })
+        
+        good_indeces = []
 
+        get_values(function(data) {
+          for (i = 0; i < data.length; i++) {
+            if (data[i] != 0) {
+              good_indeces.push(i)
+            }
+          }
+        })
+
+        get_predictions(function(data) {
+          predicts = []
+          for (i = 0; i < good_indeces.length; i++) {
+            predicted_vals = new google.maps.LatLng(data[good_indeces[i]][0], data[good_indeces[i]][1])
+            predicts.push(predicted_vals)
+          }
+          
+          var grad = [
+          'rgba(0, 255, 255, 0)',
+          'rgba(0, 255, 255, 1)',
+          'rgba(0, 191, 255, 1)',
+          'rgba(0, 127, 255, 1)',
+          'rgba(0, 63, 255, 1)',
+          'rgba(0, 0, 255, 1)',
+          'rgba(0, 0, 223, 1)',
+          'rgba(0, 0, 191, 1)',
+          'rgba(0, 0, 159, 1)',
+          'rgba(0, 0, 127, 1)',
+          'rgba(63, 0, 91, 1)',
+          'rgba(127, 0, 63, 1)',
+          'rgba(191, 0, 31, 1)',
+          'rgba(255, 0, 0, 1)'
+          ]
+          predicted_heatmap = new google.maps.visualization.HeatmapLayer({
+
+                data: predicts,
+                map: map,
+                radius: 20,
+                gradient: grad
+          });
+        })
+        
         function crime_callback(data) {
           for(i = 0; i < data.length; i++) {
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 crimes.push(crime_loc_pos)
             }
-            /*google.maps.event.addListener(map, 'zoom_changed', function(){
-                  if (heatmap){
-                      var zoom = map.getZoom();
-                      console.log(zoom) // zoom inc as you zoom in
-                      if (zoom >= 16){
-                          heatmap.set('radius', zoom*13);
-                          heatmap.set('dissipating', true);
-                      } else if (zoom > 13 && zoom < 16){
-                          heatmap.set('radius', zoom*5);
-                      } else {
-                          heatmap.set('radius', zoom); 
-                          heatmap.set('dissipating', true); 
-                      }
-                  }
-                }
-            );*/
+
             if (offset < offset_num) {
               heatmap = new google.maps.visualization.HeatmapLayer({
                 data: crimes,
                 map: map,
-                radius: 200,
+                radius: 20,
               });
               google.maps.event.addListener(map, 'zoom_changed', function(){
                   if (heatmap){
