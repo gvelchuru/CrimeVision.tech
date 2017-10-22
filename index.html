@@ -82,7 +82,6 @@
       <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Starting Point</button></div><br>
       <div> <input id="navto"></input> <button id = "custom2" onclick="navToAddress()"><i class="fa fa-car" aria-hidden="true"></i>&nbsp; &nbsp;Navigate To</button></div><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
-      <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
       <button id = "custom" onclick="togglePredictive()">Toggle Predictive Heatmap</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       
@@ -211,7 +210,7 @@
               heatmap = new google.maps.visualization.HeatmapLayer({
                 data: crimes,
                 map: map,
-                radius: 20,
+                radius: 14*4,
               });
               google.maps.event.addListener(map, 'zoom_changed', function(){
                   if (heatmap){
@@ -220,7 +219,7 @@
                       console.log(zoom) // zoom inc as you zoom in
                       if (zoom > 16){
                           heatmap.set('radius', zoom*13);
-                      } else if (zoom <= 16 && zoom > 14) {
+                      } else if (zoom <= 16 && zoom >= 14) {
                           heatmap.set('radius', zoom*4);
                       } else {
                           heatmap.set('radius', zoom); 
