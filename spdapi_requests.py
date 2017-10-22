@@ -7,7 +7,7 @@ from scipy.signal import savgol_filter
 
 def get_crime_information():
 	cl = []
-	with urllib.request.urlopen("https://data.seattle.gov/resource/policereport.json") as url:
+	with urllib.request.urlopen("https://data.seattle.gov/resource/policereport.json?$limit=5000") as url:
 	    data = json.loads(url.read().decode())
 	    count = 0
 	    for offense in data:

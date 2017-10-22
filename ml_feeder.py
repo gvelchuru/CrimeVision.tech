@@ -27,7 +27,7 @@ max_lat = 47.8
 min_long = -122.5
 max_long = -122.2
 
-min_year = 2014
+min_year = 2012
 max_year = 2017
 
 iterate = .001
