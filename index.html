@@ -63,7 +63,8 @@
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
           zoom: 13,
-          center: {lat: 47.6062, lng: -122.3321},
+          // get user loc to replace center
+          center: {lat: 47.6062, lng: -122.3321}, // current location is seattle
           mapTypeId: 'satellite'
         });
 
@@ -83,7 +84,9 @@
             }
             heatmap = new google.maps.visualization.HeatmapLayer({
               data: crime_location,
-              map: map
+              map: map,
+              dissipating: true,
+              radius: 50
             });
         })
         
