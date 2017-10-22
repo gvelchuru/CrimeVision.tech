@@ -75,11 +75,10 @@
       <div> <input id="address"></input> <button id = "custom2" onclick="goToAddress()"><i class="fa fa-search" aria-hidden="true"></i> &nbsp; &nbsp;Search</button></div><br>
       <div> <input id="navto"></input> <button onclick="navToAddress()">navigate to</button></div><br>
       <button id = "custom" onclick="toggleHeatmap()">Toggle Heatmap</button><br>
-      <button id = "custom" onclick="meters()">Get ass</button><br>
+      <button id = "custom" onclick="meters()">Get meters</button><br>
       <button id = "custom" onclick="toggleMarkers()">Toggle markers</button><br>
       <br><select onChange="display_different_crimes()">
         <option value="mostRecent">Most Recent 50000</option>
-<<<<<<< HEAD
         <option value="50000more">50000 - 100000</option>
         <option value="50000more">100000 - 150000</option>
         <option value="50000more">150000 - 200000</option>
@@ -100,6 +99,7 @@
 
     <script type="text/javascript" src="shineapirequests.js"></script> 
     <script type="text/javascript" src="spdapirequests.js"></script>
+    <script type="text/javascript" src="predictionRequests.js"></script>  
     <script type='text/javascript'>
       function display_different_crimes()
       {
@@ -112,11 +112,12 @@
       // parameter when you first load the API. For example:
       // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
 
-      var map, heatmap, geocoder;
+      var map, heatmap, predicted_heatmap, geocoder;
       var markers = [];
       var showMarkers = true;
       var directionsService;
-      var numberOfCrimes = 50000;
+      var offset_num = 10000;
+      var numberOfCrimes = offset_num;
       var offset = 0;
       var crimes = [];
 
@@ -155,28 +156,46 @@
             }
         })
 
+        get_predictions(function(data) {
+          predicts = []
+          console.log("once there was a man from nantucket");
+          for (i = 0; i < data.length; i++) {
+              predicted_pos = new google.maps.LatLng(data[i][0], data[i][1])
+              predicts.push(predicted_pos)
+            
+          }
+          var grad = [
+          'rgba(0, 255, 255, 0)',
+          'rgba(0, 255, 255, 1)',
+          'rgba(0, 191, 255, 1)',
+          'rgba(0, 127, 255, 1)',
+          'rgba(0, 63, 255, 1)',
+          'rgba(0, 0, 255, 1)',
+          'rgba(0, 0, 223, 1)',
+          'rgba(0, 0, 191, 1)',
+          'rgba(0, 0, 159, 1)',
+          'rgba(0, 0, 127, 1)',
+          'rgba(63, 0, 91, 1)',
+          'rgba(127, 0, 63, 1)',
+          'rgba(191, 0, 31, 1)',
+          'rgba(255, 0, 0, 1)'
+          ]
+          predicted_heatmap = new google.maps.visualization.HeatmapLayer({
+
+                data: predicts,
+                map: map,
+                radius: 200,
+                gradient: grad
+          });
+        })
+
         function crime_callback(data) {
           for(i = 0; i < data.length; i++) {
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 crimes.push(crime_loc_pos)
             }
-            /*google.maps.event.addListener(map, 'zoom_changed', function(){
-                  if (heatmap){
-                      var zoom = map.getZoom();
-                      console.log(zoom) // zoom inc as you zoom in
-                      if (zoom >= 16){
-                          heatmap.set('radius', zoom*13);
-                          heatmap.set('dissipating', true);
-                      } else if (zoom > 13 && zoom < 16){
-                          heatmap.set('radius', zoom*5);
-                      } else {
-                          heatmap.set('radius', zoom); 
-                          heatmap.set('dissipating', true); 
-                      }
-                  }
-                }
-            );*/
-            if (offset < 50000) {
+            
+            if (offset < offset_num) {
               heatmap = new google.maps.visualization.HeatmapLayer({
                 data: crimes,
                 map: map,
@@ -206,8 +225,8 @@
               heatmap.setData(crimes)
               console.log("Bye")
             }
-            offset += 50000;
-            if (offset < 50000) {
+            offset += offset_num;
+            if (offset < offset_num) {
               get_crimes(numberOfCrimes, offset, crime_callback);
             }
 
@@ -258,7 +277,7 @@
         
         var willSetData = new Promise(
           function(resolve, reject) {
-            if (heat_crimes.length > 49999) {
+            if (heat_crimes.length > offset_num - 1) {
               heatmap.setData(heat_crimes);
               resolve(heat_crimes);
             } else {
@@ -269,7 +288,7 @@
         );
         heat_crimes = [];
         for (j = 0; j < val; j++) {
-          get_crimes(numberOfCrimes, j * 50000, function(data) {
+          get_crimes(numberOfCrimes, j * offset_num, function(data) {
             for(i = 0; i < data.length; i++) {
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 heat_crimes.push(crime_loc_pos)
@@ -300,7 +319,7 @@
                 crime_loc_pos = new google.maps.LatLng(data[i]['location']['latitude'], data[i]['location']['longitude'])
                 crimes.push(crime_loc_pos)
             }
-            offset += 50000;
+            offset += offset_num;
         })
       }
       
