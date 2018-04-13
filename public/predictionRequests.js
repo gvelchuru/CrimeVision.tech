@@ -2,7 +2,7 @@ function get_predictions(callback) {
   //file = JSON.parse()
 	//url = get_crimes_url(limit, offset)
     let options = {
-      "url": "2018_keylist.txt",
+      "url": "2018_keyList.txt",
       "dataType": "json",
       "method": "GET",
       "processData": false
